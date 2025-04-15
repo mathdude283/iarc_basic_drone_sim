@@ -4,8 +4,14 @@ class Grid:
     """A class representing the grid of mines and safe locations"""
     def __init__(self, length: int, width: int, mine_density: float = 0.2):
         self.length = length
+        if self.length < 1:
+            raise ValueError("Length must be at least 1.")
         self.width = width
+        if self.width < 4:
+            raise ValueError("Width must be at least 4.")
         self.mine_density = mine_density
+        if self.mine_density < 0 or self.mine_density > 1:
+            raise ValueError("Mine density must be between 0 and 1.")
         self.grid = [['O' for _ in range(width)] for _ in range(length)]
         self.generate_grid()
 
@@ -34,13 +40,13 @@ class Grid:
             print(" ".join(row))
         print()
     
-    def check_valid_loc(self, loc: tuple[int, int]) -> bool:
+    def check_valid_loc(self, loc: list[int, int]) -> bool:
         # Check if the location is within bounds and not a mine
         if 0 <= loc[0] < self.length and 0 <= loc[1] < self.width:
             return True
         return False
     
-    def mine_at_loc(self, loc: tuple[int, int]) -> bool:
+    def mine_at_loc(self, loc: list[int, int]) -> bool:
         # Check if the location is within bounds and contains a mine
         if self.check_valid_loc(loc):
             return self.grid[loc[0]][loc[1]] == 'X'
