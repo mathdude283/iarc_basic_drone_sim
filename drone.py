@@ -2,7 +2,9 @@ import math
 
 
 from grid import Grid
+from map import Map
 from drone_state import DroneState
+from tile_state import TileState
 
 class Drone:
     """A class representing a drone that can move around the grid"""
@@ -25,6 +27,17 @@ class Drone:
     def distance(self, start: list[int, int], target: list[int, int]) -> float:
         # Calculate the Euclidean distance between two points
         return round(math.sqrt((start[0] - target[0]) ** 2 + (start[1] - target[1]) ** 2), 1)
+    
+    def start_scan(self) -> bool:
+        # Starts scanning for a mine at the specified location
+        self.state = DroneState.SCANNING
+        self.scan_rem = self.scan_len
+
+    def scan_for_time(self, time: float) -> None:
+        # Scan the area for a specified time
+        self.scan_rem -= time
+        if self.scan_rem <= 0:
+            self.scan_rem = 0
 
     def start_move(self) -> None:
         # Starts the drone moving towards the target location
@@ -48,17 +61,6 @@ class Drone:
             self.start_move()
         else:
             self.state = DroneState.IDLE
-
-    def start_scan(self) -> bool:
-        # Starts scanning for a mine at the specified location
-        self.state = DroneState.SCANNING
-        self.scan_rem = self.scan_len
-
-    def scan_for_time(self, time: float) -> None:
-        # Scan the area for a specified time
-        self.scan_rem -= time
-        if self.scan_rem <= 0:
-            self.scan_rem = 0
     
     def finish_scan(self) -> list[bool, list[int, int]]:
         # Check if the current position contains a mine
@@ -71,6 +73,10 @@ class Drone:
     def get_state(self) -> DroneState:
         # Check if the drone is currently moving
         return self.state
+    
+    def get_pos(self) -> list[int, int]:
+        # Get the current position of the drone
+        return self.pos
 
     def get_speed(self) -> int:
         # Get the speed of the drone
@@ -131,11 +137,12 @@ class Drone:
         return time_estimate
 
 
-class DroneController(Drone):
+class ControllerDrone(Drone):
     """A class representing the controller drone"""
-    def __init__(self, pos: list[int, int], grid: Grid, drones: list[Drone, Drone, Drone]) -> None:
+    def __init__(self, pos: list[int, int], grid: Grid, drones: list[Drone, Drone, Drone], map: Map) -> None:
         super().__init__(pos, grid)
         self.drones: list[Drone] = drones
+        self.map: Map = map
     
     def assign_specific_drone(self, drone: Drone, target: list[int, int], scan: bool) -> None:
         # Assign a specific drone to a target location
@@ -152,6 +159,5 @@ class DroneController(Drone):
             if drone_task_lens[drone] < drone_task_lens[min_drone]:
                 min_drone = drone
         self.assign_specific_drone(self.drones[min_drone], target, scan)
-    
-    
-        
+
+

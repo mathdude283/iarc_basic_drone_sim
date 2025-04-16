@@ -4,6 +4,7 @@ class TileState(Enum):
     """Enum representing the state of a tile."""
     UNKNOWN = 0
     SAFE = 1
-    MINE = 2
-    QUEUED = 3
-    SCANNING = 4
+    UNSAFE = 2
+    MINE = 3
+    QUEUED = 4
+    SCANNING = 5

@@ -36,6 +36,7 @@ class Grid:
 
     def print_grid(self):
         # Print the grid to the console
+        print("Grid:")
         for row in self.grid:
             print(" ".join(row))
         print()
