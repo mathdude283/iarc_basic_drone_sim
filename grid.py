@@ -54,7 +54,8 @@ class Grid:
         print("Invalid location:", loc)
         return False
 
-    def find_start_loc(self) -> int:
+    # Plan to implement this in controller drone
+    """def find_start_loc(self) -> int:
         # Find a valid starting location in the first row of the grid
         row_length = len(self.grid[0])
         row_middle = row_length // 2
@@ -68,5 +69,5 @@ class Grid:
             if row_pos < 0:
                 print("No valid starting locations found.")
                 return None
-        return row_pos
+        return row_pos"""
     

@@ -9,3 +9,8 @@ MINE_DENSITY = 0.2 # Approximate density of mines in the grid
 
 test_map = Map(GRID_LENGTH, GRID_WIDTH)
 test_map.print_map()
+
+safeCompletion = False
+
+while not safeCompletion:
+    pass

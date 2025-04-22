@@ -30,6 +30,9 @@ class Drone:
     
     def start_scan(self) -> bool:
         # Starts scanning for a mine at the specified location
+        if self.pos[0] >= self.grid.get_length() or self.pos[0] < 0 or self.pos[1] >= self.grid.get_width() or self.pos[1] < 0:
+            raise ValueError("Location out of bounds")
+
         self.state = DroneState.SCANNING
         self.scan_rem = self.scan_len
 
@@ -146,9 +149,15 @@ class ControllerDrone(Drone):
     
     def assign_specific_drone(self, drone: Drone, target: list[int, int], scan: bool) -> None:
         # Assign a specific drone to a target location
+        if target[0] < -2 or target[0] >= self.grid.get_length() + 1 or target[1] < 0 or target[1] >= self.grid.get_width():
+            raise ValueError("Location out of bounds")
         drone.task_list.append((target, scan))
 
     def assign_drone(self, target: list[int, int], scan: bool):
+        if target[0] < -2 or target[0] >= self.grid.get_length() + 1 or target[1] < 0 or target[1] >= self.grid.get_width():
+            raise ValueError("Location out of bounds")
+        if (target[0] < 0 and scan) or (target[0] == self.grid.get_length() and scan):
+            raise ValueError("Cannot scan start or end location")
         drone_task_lens: list[float, float, float] = [0, 0, 0]
         for drone in range(len(self.drones)):
             drone_tasks: list[float, list[int, int]] = self.drones[drone].tasks_cost()

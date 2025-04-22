@@ -13,17 +13,25 @@ class Map:
 
     def get_tile_status(self, loc: list[int, int]) -> TileState:
         """Gets the status of a tile"""
-        if loc[0] < 0 or loc[0] >= self.mfld_length or loc[1] < 0 or loc[1] >= self.mfld_width:
+        if loc[0] < -2 or loc[0] >= self.mfld_length + 1 or loc[1] < 0 or loc[1] >= self.mfld_width:
             raise ValueError("Location out of bounds")
-        return self.map[loc[0]][loc[1]]
+        if loc[0] < 0:
+            return self.end[loc[0] + 2][loc[1]]
+        elif loc[0] == self.mfld_length:
+            return self.start[loc[1]]
+        else:
+            return self.map[loc[0]][loc[1]]
     
     def queue_tile(self, loc: list[int, int]) -> None:
         """Queues a tile for scanning."""
         if loc[0] < 0 or loc[0] >= self.mfld_length or loc[1] < 0 or loc[1] >= self.mfld_width:
             raise ValueError("Location out of bounds")
-        if self.map[loc[0]][loc[1]] != TileState.UNKNOWN:
+        if self.map[loc[0]][loc[1]] == TileState.UNKNOWN:
+            self.map[loc[0]][loc[1]] = TileState.QUEUED
+        elif self.map[loc[0]][loc[1]] == TileState.UNSAFE_UNKNOWN:
+            self.map[loc[0]][loc[1]] = TileState.UNSAFE_QUEUED
+        else:
             raise ValueError("Tile already scanned or queued")
-        self.map[loc[0]][loc[1]] = TileState.QUEUED
     
     def scan_tile(self, loc: list[int, int]) -> None:
         """Scans a tile."""
