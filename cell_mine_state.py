@@ -5,3 +5,5 @@ class CellMineState(Enum):
     UNKNOWN = 0
     EMPTY = 1
     MINE = 2
+    QUEUED = 3
+    SCANNING = 4
