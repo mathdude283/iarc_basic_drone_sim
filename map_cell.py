@@ -6,8 +6,8 @@ class MapCell:
     Class representing a cell in the map.
     """
     def __init__(self, mine_state: CellMineState = CellMineState.UNKNOWN, safety_state: CellSafetyState = CellSafetyState.UNKNOWN) -> None:
-        self.mine_state = mine_state
-        self.safety_state = safety_state
+        self.mine_state: CellMineState = mine_state
+        self.safety_state: CellSafetyState = safety_state
 
     def set_mine_state(self, mine_state: CellMineState) -> None:
         """Sets the mine state of the cell.
