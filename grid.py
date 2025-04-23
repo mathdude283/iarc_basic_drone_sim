@@ -1,3 +1,5 @@
+from random import *
+
 from cell_mine_state import CellMineState
 from grid_cell import GridCell
 
