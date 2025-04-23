@@ -1,128 +1,19 @@
-from tile_state import TileState
+from cell_mine_state import CellMineState
+from cell_safety_state import CellSafetyState
+from map_cell import MapCell
 
 class Map:
-    """A class representing the current drone positions and mapped out area."""
-    def __init__(self, mfld_length: int, mfld_width: int) -> None:
-        """Initialize the map with the given length and width."""
-        self.mfld_length: int = mfld_length
-        self.mfld_width: int = mfld_width
-        self.length: int = self.mfld_length + 3
-        self.start = [TileState.SAFE for _ in range(self.mfld_width)]
-        self.end = [[TileState.SAFE for _ in range(self.mfld_width)] for _ in range(2)]
-        self.map = [[TileState.UNKNOWN for _ in range(self.mfld_width)] for _ in range(self.mfld_length)]
-
-    def get_tile_status(self, loc: list[int, int]) -> TileState:
-        """Gets the status of a tile"""
-        if loc[0] < -2 or loc[0] >= self.mfld_length + 1 or loc[1] < 0 or loc[1] >= self.mfld_width:
-            raise ValueError("Location out of bounds")
-        if loc[0] < 0:
-            return self.end[loc[0] + 2][loc[1]]
-        elif loc[0] == self.mfld_length:
-            return self.start[loc[1]]
-        else:
-            return self.map[loc[0]][loc[1]]
     
-    def queue_tile(self, loc: list[int, int]) -> None:
-        """Queues a tile for scanning."""
-        if loc[0] < 0 or loc[0] >= self.mfld_length or loc[1] < 0 or loc[1] >= self.mfld_width:
-            raise ValueError("Location out of bounds")
-        if self.map[loc[0]][loc[1]] == TileState.UNKNOWN:
-            self.map[loc[0]][loc[1]] = TileState.QUEUED
-        elif self.map[loc[0]][loc[1]] == TileState.UNSAFE_UNKNOWN:
-            self.map[loc[0]][loc[1]] = TileState.UNSAFE_QUEUED
-        else:
-            raise ValueError("Tile already scanned or queued")
-    
-    def scan_tile(self, loc: list[int, int]) -> None:
-        """Scans a tile."""
-        if loc[0] < 0 or loc[0] >= self.mfld_length or loc[1] < 0 or loc[1] >= self.mfld_width:
-            raise ValueError("Location out of bounds")
-        if self.map[loc[0]][loc[1]] != TileState.QUEUED:
-            raise ValueError("Tile not queued for scanning")
-        self.map[loc[0]][loc[1]] = TileState.SCANNING
-    
-    def mark_safe(self, loc: list[int, int]) -> None:
-        """Marks a tile as safe."""
-        if loc[0] < 0 or loc[0] >= self.mfld_length or loc[1] < 0 or loc[1] >= self.mfld_width:
-            raise ValueError("Location out of bounds")
-        if self.map[loc[0]][loc[1]] == TileState.UNKNOWN or self.map[loc[0]][loc[1]] == TileState.QUEUED:
-            raise ValueError("Tile not yet scanned")
-        if self.map[loc[0]][loc[1]] == TileState.SAFE:
-            raise ValueError("Tile already marked safe")
-        if self.map[loc[0]][loc[1]] == TileState.MINE or self.map[loc[0]][loc[1]] == TileState.UNSAFE:
-            raise ValueError("Tile known to be unsafe")
-        self.map[loc[0]][loc[1]] = TileState.SAFE
-    
-    def mark_mine(self, loc: list[int, int]) -> None:
-        """Marks a tile as a mine."""
-        if loc[0] < 0 or loc[0] >= self.mfld_length or loc[1] < 0 or loc[1] >= self.mfld_width:
-            raise ValueError("Location out of bounds")
-        if self.map[loc[0]][loc[1]] == TileState.UNKNOWN or self.map[loc[0]][loc[1]] == TileState.QUEUED:
-            raise ValueError("Tile not yet scanned")
-        if self.map[loc[0]][loc[1]] == TileState.MINE:
-            raise ValueError("Tile already marked as mine")
-        if self.map[loc[0]][loc[1]] == TileState.SAFE:
-            raise ValueError("Tile known to be safe")
-        self.map[loc[0]][loc[1]] = TileState.MINE
-
-    def mark_unsafe(self, loc: list[int, int]) -> None:
-        """Marks a tile as unsafe."""
-        if loc[0] < 0 or loc[0] >= self.mfld_length or loc[1] < 0 or loc[1] >= self.mfld_width:
-            raise ValueError("Location out of bounds")
-        if self.map[loc[0]][loc[1]] == TileState.UNKNOWN or self.map[loc[0]][loc[1]] == TileState.QUEUED:
-            raise ValueError("Tile not yet scanned")
-        if self.map[loc[0]][loc[1]] == TileState.MINE:
-            raise ValueError("Tile already known to be a mine")
-        if self.map[loc[0]][loc[1]] == TileState.SAFE:
-            raise ValueError("Tile already marked safe")
-        self.map[loc[0]][loc[1]] = TileState.UNSAFE 
-    
-    def finish_scan(self, loc: list[int, int], status: TileState) -> None:
-        """Finishes scanning a tile."""
-        if loc[0] < 0 or loc[0] >= self.mfld_length or loc[1] < 0 or loc[1] >= self.mfld_width:
-            raise ValueError("Location out of bounds")
-        if self.map[loc[0]][loc[1]] != TileState.SCANNING:
-            raise ValueError("Tile not currently scanning")
-        if status == TileState.UNKNOWN or status == TileState.QUEUED or status == TileState.SCANNING:
-            raise ValueError("Invalid Scan Status")
-        self.map[loc[0]][loc[1]] = status
-
-    def get_tile_repr(self, tile: TileState) -> str:
-        """Get the string representation of a tile."""
-        if tile == TileState.UNKNOWN:
-            return "?"
-        elif tile == TileState.SAFE:
-            return "O"
-        elif tile == TileState.MINE:
-            return "X"
-        elif tile == TileState.QUEUED:
-            return "Q"
-        elif tile == TileState.SCANNING:
-            return "S"
-        else:
-            raise ValueError(f"Unknown tile state: {tile}")
-
-    def print_map(self) -> None:
-        """Prints the current status of the map."""
-
-        print("Map:")
-        for row in self.end:
-            for cell in row:
-                print(self.get_tile_repr(cell), end=" ")
-            print()
-        for _ in range(self.mfld_width * 2 - 1):
-            print("-", end="")
-        print()
-
-        for row in self.map:
-            for cell in row:
-                print(self.get_tile_repr(cell), end=" ")
-            print()
-        for _ in range(self.mfld_width * 2 - 1):
-            print("-", end="")
-        print()
-
-        for cell in self.start:
-            print(self.get_tile_repr(cell), end=" ")
-        print()
-        print()
+    """
+    Class representing known mine locations and safety states of cells in a minefield.
+    """
+    def __init__(self, length: int = 10, width: int = 10, cell_size: float = 1) -> None:
+        if length <= 0:
+            raise ValueError("Length must be positive integer.")
+        if width < 4:
+            raise ValueError("Width must be at least 4.")
+        if cell_size <= 0:
+            raise ValueError("Cell size must be positive integer.")
+        self.length: int = length
+        self.width: int = width
+        self.cell_size: float = cell_size
