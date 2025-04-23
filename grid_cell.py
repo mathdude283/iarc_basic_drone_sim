@@ -4,7 +4,7 @@ class GridCell:
     """
     Class representing a cell in the grid.
     """
-    def __init__(self, mine_state: CellMineState = CellMineState.SAFE) -> None:
+    def __init__(self, mine_state: CellMineState = CellMineState.EMPTY) -> None:
         if (mine_state == CellMineState.UNKNOWN or mine_state == CellMineState.QUEUED or mine_state == CellMineState.SCANNING):
             raise ValueError("Grid mine state cannot be UNKNOWN, QUEUED, or SCANNING.")
         self.mine_state: CellMineState = mine_state
